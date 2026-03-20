@@ -1,16 +1,12 @@
-boto3==1.38.38
 csscompressor==0.9.5
 django-admin-cursor-paginator==0.1.6
 django-compressor==4.5.1
 django-extra-views==0.16.0
 django-node-assets==0.9.15
 django-registration==5.2.1
-django-social-share==2.3.0
 django-sortedm2m==4.0.0
-django-storages==1.14.6
 Django==4.2.29
 rcvformats==0.0.46
-selenium==4.31.0  # Stay below 4.32.0 until this is fixed: https://github.com/SeleniumHQ/selenium/issues/15772
 requests==2.32.4
 whitenoise==6.4.0
 
@@ -28,15 +24,11 @@ pycodestyle==2.13.0
 
 # For django-rest
 djangorestframework==3.16.0
-drf-api-tracking==1.8.4
 markdown==3.8.1
 
-# For movie creation
-celery==5.5.3
 django-cleanup==9.0.0
-moviepy==2.2.1
-pillow<12.0.0 # Highest version supported by moviepy
+pillow<12.0.0
 
-# For Heroku
+# For serving
 gunicorn==23.0.0
 django-on-heroku==1.1.2

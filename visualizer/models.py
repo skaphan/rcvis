@@ -32,16 +32,6 @@ class TextForWinner(models.IntegerChoices):
     LEAD = 3, _('Candidate is in the lead')
 
 
-class MovieGenerationStatuses(models.IntegerChoices):
-    """ Describes the status of movie generation for this model """
-    NOT_REQUESTED = 0, _('No movie generation has been requested')
-    NOT_STARTED = 1, _('Movie generation has been requested but not started')
-    PICKED_UP_BY_TASK = 2, _('Movie generation task has begun')
-    LANDSCAPE_COMPLETE = 3, _('Landscape generation complete, portrait pending')
-    COMPLETE = 4, _('Complete')
-    FAILED = 5, _('Failed')
-
-
 class JsonConfig(models.Model):
     """ A Json file representing a single election, and its configuration """
     detail_views = ('visualizer.views.Visualize',)
@@ -67,21 +57,6 @@ class JsonConfig(models.Model):
     textForWinner = models.IntegerField(choices=TextForWinner.choices, default=0)
     customText = models.CharField(max_length=256, default="", blank=True)
 
-    # Movie
-    movieGenerationStatus = models.IntegerField(
-        choices=MovieGenerationStatuses.choices,
-        default=0,
-    )
-    movieHorizontal = models.OneToOneField('movie.Movie',
-                                           related_name='+',  # disable related_name
-                                           on_delete=models.CASCADE,
-                                           null=True,
-                                           blank=True)
-    movieVertical = models.OneToOneField('movie.Movie',
-                                         related_name='+',  # disable related_name
-                                         on_delete=models.CASCADE,
-                                         null=True,
-                                         blank=True)
     titleImage = models.ImageField(upload_to='titleImages', null=True)
 
     # Options modifiable at upload or runtime
