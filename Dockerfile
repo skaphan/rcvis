@@ -38,9 +38,11 @@ ENV RCVIS_DEBUG=False \
     RCVIS_HOST=localhost \
     DJANGO_SETTINGS_MODULE=rcvis.settings
 
-# Compress templates and collect static files at build time
+# Compress templates, collect static files, and run migrations at build time
+# (so the SQLite DB is pre-migrated in the image — fast cold starts)
 RUN RCVIS_SECRET_KEY=build-placeholder python manage.py compress --force \
-    && RCVIS_SECRET_KEY=build-placeholder python manage.py collectstatic --noinput
+    && RCVIS_SECRET_KEY=build-placeholder python manage.py collectstatic --noinput \
+    && RCVIS_SECRET_KEY=build-placeholder python manage.py migrate --noinput
 
 # Create directories for runtime data
 RUN mkdir -p /app/media /tmp/django_rcvis_cache
