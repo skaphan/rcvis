@@ -28,7 +28,6 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView
 from rcvformats.conversions.automatic import AutomaticConverter
 from rest_framework import permissions, viewsets
-from rest_framework_tracking.mixins import LoggingMixin
 
 # rcvis helpers
 from accounts.permissions import IsOwnerOrReadOnly, HasAPIAccess
@@ -516,7 +515,7 @@ class ConvertToRCTabFormat(ValidateDataEntry):
 # For django REST
 
 
-class JsonOnlyViewSet(LoggingMixin, viewsets.ModelViewSet):
+class JsonOnlyViewSet(viewsets.ModelViewSet):
     """ API endpoint that allows tabulated JSONs to be viewed or edited. """
     queryset = JsonConfig.objects.all().order_by('-uploadedAt')
     serializer_class = JsonOnlySerializer
@@ -526,7 +525,7 @@ class JsonOnlyViewSet(LoggingMixin, viewsets.ModelViewSet):
         serializer.save(owner=self.request.user)
 
 
-class VerboseViewSet(LoggingMixin, viewsets.ModelViewSet):
+class VerboseViewSet(viewsets.ModelViewSet):
     """ API endpoint that expects all arguments to be supplied. """
     queryset = JsonConfig.objects.all().order_by('-uploadedAt')
     serializer_class = VerboseSerializer
@@ -536,7 +535,7 @@ class VerboseViewSet(LoggingMixin, viewsets.ModelViewSet):
         serializer.save(owner=self.request.user)
 
 
-class BallotpediaViewSet(LoggingMixin, viewsets.ModelViewSet):
+class BallotpediaViewSet(viewsets.ModelViewSet):
     """ API endpoint with all ballotpedia fields """
     queryset = JsonConfig.objects.all().order_by('-uploadedAt')
     serializer_class = BallotpediaSerializer
@@ -546,7 +545,7 @@ class BallotpediaViewSet(LoggingMixin, viewsets.ModelViewSet):
         serializer.save(owner=self.request.user)
 
 
-class UserViewSet(LoggingMixin, viewsets.ReadOnlyModelViewSet):
+class UserViewSet(viewsets.ReadOnlyModelViewSet):
     """ API endpoint that allows you to view but not edit Users. """
     queryset = get_user_model().objects.all().order_by('-id')
     serializer_class = UserSerializer
