@@ -385,12 +385,13 @@ class JSONReader:
                 eliminationOrder.append(candidate)
                 candidatesRemaining.remove(candidate)
 
-        # Winners are added last
+        # Winners are added last (skip duplicates from surplus redistribution rounds)
         winners = []
         for rnd in rounds:
             for winner in rnd.winners:
-                winners.append(winner)
-                candidatesRemaining.remove(winner)
+                if winner in candidatesRemaining:
+                    winners.append(winner)
+                    candidatesRemaining.remove(winner)
         winners = reversed(winners)
 
         # Remaining candidates: survived til last round, neither eliminated nor elected
