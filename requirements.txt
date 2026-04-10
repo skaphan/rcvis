@@ -1,2 +1,1 @@
 -r infra/requirements-core.txt
--r infra/requirements-not-for-readthedocs.txt

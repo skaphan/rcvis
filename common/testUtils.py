@@ -15,7 +15,6 @@ from django.contrib.auth.models import Permission
 
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
-from scraper.models import MultiScraper, Scraper
 from visualizer.models import JsonConfig
 from visualizer.tests import filenames
 
@@ -215,36 +214,6 @@ class TestHelpers():
             user.user_permissions.add(Permission.objects.get(codename=auth))
         return get_user_model().objects.get(pk=user.pk)
 
-    @classmethod
-    def make_scraper(cls):
-        """ Creates a scraper object. You must mock out requests.get if you plan to scrape. """
-        return Scraper.objects.create(scrapableURL="mock://scrape", sourceURL="mock://source")
-
-    @classmethod
-    def make_multi_scraper(cls):
-        """
-        Creates a multi-scraper object.
-        You must mock out requests.get if you plan to scrape.
-        """
-        return MultiScraper.objects.create(
-            scrapableURL="mock://multiscrape", sourceURL="mock://source")
-
-    @classmethod
-    def mock_scraper_url_with_file(
-            cls,
-            requestMock,
-            url='mock://scrape',
-            filename=filenames.ONE_ROUND):
-        """ Creates a valid response from the server """
-        with open(filename, 'r', encoding='utf-8') as f:
-            data = f.read()
-        requestMock.get(url, text=data)
-
-    @classmethod
-    def login_with_scrape_permissions(cls, client):
-        """ Logs in and creates permissions needed to run scraper """
-        user = TestHelpers.login(client)
-        return TestHelpers.give_auth(user, ['add_scraper', 'change_scraper'])
 
 
 # Silence logging spam for any test that includes this
