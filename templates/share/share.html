@@ -1,39 +1,5 @@
-{% load social_share %}
 {% load share_icon %}
 {% load static %}
-
-<div class="container" id="sharecontainer">
-  <div class="row mb-4">
-    <h2>Share To</h2>
-  </div>
-
-  <div class="row" justify-content-md-center>
-    <div class="col-sm">
-        {% get_icon 'Twitter' as html %}
-        {% post_to_twitter "{{title}} Ranked Choice Voting Results, Visualized by @rcvisdotcom" object_or_url html %}
-    </div>
-    <div class="col-sm">
-        {% get_icon 'Facebook' as html %}
-        {% post_to_facebook object_or_url html %}
-    </div>
-    <div class="col-sm">
-        {% get_icon 'Reddit' as html %}
-        {% post_to_reddit "{{title}} Ranked Choice Voting Results, Visualized" object_or_url html %}
-    </div>
-    <div class="col-sm">
-        {% get_icon 'Telegram' as html %}
-        {% post_to_telegram "{{title}} Ranked Choice Voting Results, Visualized" object_or_url html %}
-    </div>
-    <div class="col-sm">
-        {% get_icon 'WhatsApp' as html %}
-        {% post_to_whatsapp object_or_url html %}
-    </div>
-    <div class="col-sm">
-        {% get_icon 'Email' as html %}
-        {% send_email object.title "{{title}} Ranked Choice Voting Results, Visualized." object_or_url html %}
-    </div>
-  </div>
-</div>
 
 <div class="container">
   <div class="row justify-content-md-left mt-5">

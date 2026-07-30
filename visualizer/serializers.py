@@ -28,10 +28,7 @@ class BaseVisualizationSerializer(serializers.HyperlinkedModelSerializer):
         owner = serializers.ReadOnlyField(source='owner.username')
         read_only_fields = (
             'slug',
-            'id',
-            'movieHorizontal',
-            'movieVertical',
-            'movieGenerationStatus')
+            'id')
         read_only_but_validate_fields = ('numRounds', 'numCandidates', 'title')
         fields = read_only_fields + read_only_but_validate_fields
 

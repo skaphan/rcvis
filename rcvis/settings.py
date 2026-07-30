@@ -12,7 +12,10 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 
 import os
 
-import django_on_heroku
+try:
+    import django_on_heroku
+except ImportError:
+    django_on_heroku = None
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -53,21 +56,15 @@ INSTALLED_APPS = [
     'django.contrib.sites',
 
     'visualizer',
-    'movie',
-    'scraper',
-    'electionpage',
 
     'admin_cursor_paginator',
     'accounts.apps.AccountsAppConfig',
-    'storages',
     'compressor',
     'extra_views',
     'rest_framework',
     'rest_framework.authtoken',
-    'rest_framework_tracking',
     'sortedm2m',
     'django_cleanup.apps.CleanupConfig',
-    'django_social_share',
     'django_node_assets',
 
     'django_extensions'
@@ -255,29 +252,13 @@ LOGGING = {
     }
 }
 
-# Uploaded media
-if not OFFLINE_MODE:
-    STORAGES["default"] = {"BACKEND": "storages.backends.s3boto3.S3Boto3Storage"}
-    AWS_STORAGE_BUCKET_NAME = os.environ['AWS_STORAGE_BUCKET_NAME']
-    AWS_S3_REGION_NAME = os.environ['AWS_S3_REGION_NAME']
-    AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
-    AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
-    AWS_S3_FILE_OVERWRITE = False
-else:
-    STORAGES["default"] = {"BACKEND": "django.core.files.storage.FileSystemStorage"}
-    MEDIA_URL = '/media/'
-    MEDIA_ROOT = os.path.join(BASE_DIR, "media")
-    MEDIAFILES_DIRS = [
-        os.path.join(BASE_DIR, "media"),
-    ]
-
-# For scaling heroku workers up if needed
-HEROKU_API_KEY = os.environ.get('HEROKU_API_KEY')
-HEROKU_APP_NAME = os.environ.get('HEROKU_APP_NAME')
-HEROKU_WORKER_DYNO_TYPE = os.environ.get('HEROKU_WORKER_DYNO_TYPE')
-
-# Movie creation
-AWS_POLLY_STORAGE_BUCKET_NAME = os.environ.get('AWS_POLLY_STORAGE_BUCKET_NAME')
+# Uploaded media — always use local filesystem storage
+STORAGES["default"] = {"BACKEND": "django.core.files.storage.FileSystemStorage"}
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIAFILES_DIRS = [
+    os.path.join(BASE_DIR, "media"),
+]
 
 # Cloudflare API
 CLOUDFLARE_ZONE_ID = os.environ.get('CLOUDFLARE_ZONE_ID')
@@ -319,7 +300,7 @@ MAILCHIMP_API_KEY = os.environ.get("MAILCHIMP_API_KEY")
 MAILCHIMP_LIST_ID = os.environ.get("MAILCHIMP_LIST_ID")
 MAILCHIMP_DC = os.environ.get("MAILCHIMP_DC")
 
-if not OFFLINE_MODE:
+if not OFFLINE_MODE and django_on_heroku is not None:
     # Otherwise tests will use a live database and not clear after each test
     # Also ensure logging is output on remote
     django_on_heroku.settings(locals(), staticfiles=False, secret_key=False, logging=False)
