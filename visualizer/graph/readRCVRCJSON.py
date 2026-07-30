@@ -1,10 +1,16 @@
 """ Class which reads an RCVRC-formatted JSON file """
 import abc
 import datetime
+import re
 
 from visualizer import common
 from . import rcvResult
 from .graph import Graph
+
+# YYYY-MM-DD only. Anything else (year-only, mm/dd/yyyy, empty, etc.)
+# is treated as "no usable date" rather than a parse error — see
+# parse_date below for rationale.
+_ISO_DATE_RE = re.compile(r'^\d{4}-\d{2}-\d{2}$')
 
 
 class MigrationError(Exception):
@@ -291,12 +297,25 @@ class JSONReader:
                     MakeExhaustedAndSurplusACandidate]
 
         def parse_date(date):
-            if not date:
+            # Only YYYY-MM-DD is supported. Returning None on any other
+            # input matches the existing empty-string behavior. We don't
+            # raise here because the caller's exception handler treats any
+            # JSONReader failure as "try a different file format" — the
+            # universal-tabulator schema validator then runs as a
+            # fallback and reports a misleading "additional properties
+            # are not allowed" error to the user, masking the real cause
+            # (a year-only or otherwise malformed date string).
+            #
+            # The regex catches obvious shape mismatches (year-only,
+            # slash-separated, empty, etc.) and the strptime catches the
+            # values-out-of-range cases (e.g. month 13) that pass the
+            # regex but aren't real dates.
+            if not date or not _ISO_DATE_RE.match(date):
                 return None
-            year = int(date[0:4])
-            month = int(date[5:7])
-            day = int(date[8:10])
-            return datetime.datetime(year, month, day)
+            try:
+                return datetime.datetime.strptime(date, '%Y-%m-%d')
+            except ValueError:
+                return None
 
         def load_graph(data):
             # required
