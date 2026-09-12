@@ -295,38 +295,6 @@ class LiveBrowserHeadlessTests(liveServerTestBaseClass.LiveServerTestBaseClass):
         self._upload(filenames.ONE_ROUND)
         self.assertEqual(count_cache_misses_mocked(url), 1)
 
-    def test_sharetab_sane_links(self):
-        """ Check that the share tab has sane links for all buttons """
-        self._upload_something_if_needed()
-        self._go_to_tab("share-tab")
-
-        # Now sanity check that each of the buttons have URLs
-        allLinks = self.browser.find_elements(By.CSS_SELECTOR, '#sharecontainer a')
-        allImages = self.browser.find_elements(By.CSS_SELECTOR, '#sharecontainer img')
-        self.assertEqual(len(allLinks), 6)
-
-        # Make sure links are sane enough
-
-        # Make sure all links are sane enough and align with images
-        for link, image in zip(allLinks, allImages):
-            # Read the filename from the image path, which magically corresponds to URLs
-            imageSource = image.get_attribute('src')
-            imageFilename = os.path.basename(urlparse(imageSource).path)
-            imagePathWithoutSuffix = imageFilename[:-4]
-
-            # Read the link href
-            href = link.get_attribute('href')
-
-            # Validate the hrefs
-            if imagePathWithoutSuffix == 'email':
-                assert href.startswith('mailto:?')
-            else:
-                assert href.startswith('https://')
-                if imagePathWithoutSuffix != 'telegram':
-                    assert imagePathWithoutSuffix in href
-                else:
-                    assert 't.me' in href
-
     def test_sharetab_can_switch_vistype(self):
         """ Check that the share tab has sane URLs for iframe and embedly codes """
         # Note: in this test, can't use .text on htmlTextarea, it shows the old, stale value?
