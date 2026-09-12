@@ -100,7 +100,7 @@ class DataTablesTests(TestCase):
         formOutput = self._get_simplified_post_data()
         response = self.client.post('/uploadByDataTable.html', formOutput)
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(TestHelpers.get_latest_upload().slug, 'simpletitle')
+        self.assertRegex(TestHelpers.get_latest_upload().slug, r'^simpletitle-[0-9a-f]{12}$')
 
         # And finally, ensure that the visualization actually works
         # Since we did funny things in the file creation, it may do tricky things

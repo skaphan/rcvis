@@ -6,6 +6,7 @@ If you are getting started using the API, we recommend you start by referencing 
 or the corresponding shell script, ./scripts/api-curl-demo.sh.
 """
 
+import re
 import subprocess
 import requests
 
@@ -89,13 +90,14 @@ class RestAPIExampleCode(StaticLiveServerTestCase):
 
         # The response has information needed to embed it.
         # Use the slug to construct embeddable URLs.
-        self.assertEqual(responseJson['slug'], 'favorite-ice-cream-flavors')
+        slug = responseJson['slug']
+        self.assertRegex(slug, r'^favorite-ice-cream-flavors-[0-9a-f]{12}$')
 
         # You can also grab a direct link to RCVis
-        assert responseJson['visualizeUrl'].endswith('/v/favorite-ice-cream-flavors')
+        assert responseJson['visualizeUrl'].endswith(f'/v/{slug}')
 
         # If you want to embed it, you can grab several embedding URLs too
-        assert responseJson['embedUrl'].endswith('/vo/favorite-ice-cream-flavors/bar')
+        assert responseJson['embedUrl'].endswith(f'/vo/{slug}/bar')
         assert responseJson['embedSankeyUrl'].endswith('sankey')
         assert responseJson['embedTableUrl'].endswith('table')
 
@@ -144,10 +146,11 @@ class RestAPIExampleCode(StaticLiveServerTestCase):
 
         # The response has information needed to embed it.
         # Use the slug to construct embeddable URLs.
-        self.assertEqual(responseJson['slug'], 'favorite-ice-cream-flavors')
+        slug = responseJson['slug']
+        self.assertRegex(slug, r'^favorite-ice-cream-flavors-[0-9a-f]{12}$')
 
         # You can also grab a direct link to RCVis
-        assert responseJson['visualizeUrl'].endswith('/v/favorite-ice-cream-flavors')
+        assert responseJson['visualizeUrl'].endswith(f'/v/{slug}')
 
         # Or build an embeddable URL:
         # https://www.rcvis.com/v/{slug} for the basic embed
@@ -189,7 +192,7 @@ class RestAPIExampleCode(StaticLiveServerTestCase):
         response = requests.patch(url, data=data, headers=headers, timeout=3)
 
         # Verify the change succeeded
-        self.assertEqual(response.json()['slug'], 'favorite-ice-cream-flavors')
+        self.assertRegex(response.json()['slug'], r'^favorite-ice-cream-flavors-[0-9a-f]{12}$')
         self.assertEqual(response.json()['id'], visId)
         self.assertEqual(response.json()['dataSourceURL'], differentUrl)
 
@@ -208,4 +211,6 @@ class RestAPIExampleCode(StaticLiveServerTestCase):
         ],
             stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         output = proc.stdout.readlines()
-        self.assertIn(b'Visualization created with slug: favorite-ice-cream-flavors\n', output)
+        createdLine = re.compile(
+            rb'^Visualization created with slug: favorite-ice-cream-flavors-[0-9a-f]{12}\n$')
+        self.assertTrue(any(createdLine.match(line) for line in output), output)
