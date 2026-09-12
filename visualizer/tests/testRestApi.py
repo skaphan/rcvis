@@ -462,7 +462,7 @@ class RestAPITests(APITestCase):
 
         # Ensure purge is called once edited
         purgeMock.assert_called_once()
-        purgeMock.assert_called_with('one-round')
+        purgeMock.assert_called_with(TestHelpers.get_latest_upload().slug)
 
     def test_patch_updates_updated_at(self):
         """ REST PATCH should advance updatedAt so conditional GET
