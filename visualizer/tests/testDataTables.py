@@ -148,11 +148,12 @@ class DataTablesTests(TestCase):
 
     def test_bad_date(self):
         """
-        Date must be valid
+        A malformed date is ignored (treated as no date) rather than rejected,
+        but the date field itself is still required
         """
         formOutput = self._get_simplified_post_data()
         formOutput['configElectionDate'] = '11/11/11/11'
-        self._ajax_starts_with(formOutput, 'Error #30:')
+        self._ajax_starts_with(formOutput, 'Data is valid!')
         formOutput['configElectionDate'] = ''
         self._ajax_starts_with(formOutput, 'Error #10: Data is not valid: Must give this election')
         del formOutput['configElectionDate']
