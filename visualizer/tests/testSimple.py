@@ -176,7 +176,8 @@ class SimpleTests(TestCase):
         """ Tests uploading a random file """
         response = TestHelpers.get_multiwinner_upload_response(self.client)
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['location'], "v/city-of-eastpointe-macomb-county-mi")
+        self.assertRegex(response['location'],
+                         r'^v/city-of-eastpointe-macomb-county-mi-[0-9a-f]{12}$')
 
     def test_upload_file_failure(self):
         """ Tests that we get an error page if a file fails to upload """
@@ -195,7 +196,7 @@ class SimpleTests(TestCase):
         with open(acceptableSizeJson, encoding='utf-8') as f:
             response = self.client.post('/upload.html', {'jsonFile': f})
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['location'], "v/nothing")
+        self.assertRegex(response['location'], r'^v/nothing-[0-9a-f]{12}$')
 
         # Then verify it fails with a too-large filesize
         tooLargeJson = TestHelpers.generate_random_valid_json_of_size(1024 * 1024 * 3)  # 3 MB
@@ -286,7 +287,7 @@ class SimpleTests(TestCase):
             ('tabular-by-round', 'table-by-round-static'),
             ('tabular-by-candidate', 'table-by-candidate'),
         ]
-        expectedBaseURL = '/ve/city-of-eastpointe-macomb-county-mi?vistype='
+        expectedBaseURL = f'/ve/{slug}?vistype='
         for (hardURL, easyURL) in easyToHardURLTranslation:
             visualizeUrl = reverse('visualizeEmbedly', args=(slug, easyURL))
             response = self.client.get(visualizeUrl)
@@ -445,7 +446,7 @@ class SimpleTests(TestCase):
 
         requestPostResponse.side_effect = TestHelpers.create_request_mock({'a': 0}, 200)
         expectedLogString = "INFO:common.cloudflare:Cleared cloudflare cache for 17 starting with "\
-                            "/v/one-round: {'a': 0}"
+                            f"/v/{slug}: {{'a': 0}}"
 
         with self.settings(
                 CLOUDFLARE_AUTH_TOKEN='mytoken',
@@ -461,40 +462,40 @@ class SimpleTests(TestCase):
         }
 
         expectedData = {'files': [
-            "https://example.com/v/one-round",
-            "https://example.com/ve/one-round",
-            "https://example.com/vo/one-round",
-            "https://example.com/vo/one-round/bar",
-            "https://example.com/vo/one-round/barchart-interactive",
-            "https://example.com/vo/one-round/sankey",
-            "https://example.com/vo/one-round/table",
-            "https://example.com/vo/one-round/pie",
-            "https://example.com/vb/one-round",
-            "https://example.com/ve/one-round?vistype=barchart-interactive",
-            "https://example.com/ve/one-round?vistype=barchart-fixed",
-            "https://example.com/ve/one-round?vistype=tabular-by-candidate",
-            "https://example.com/ve/one-round?vistype=tabular-by-round",
-            "https://example.com/ve/one-round?vistype=tabular-by-round-interactive",
-            "https://example.com/ve/one-round?vistype=candidate-by-round",
-            "https://example.com/ve/one-round?vistype=sankey",
-            "https://example.com/ve/one-round?vistype=pie",
-            "https://www.example.com/v/one-round",
-            "https://www.example.com/ve/one-round",
-            "https://www.example.com/vo/one-round",
-            "https://www.example.com/vo/one-round/bar",
-            "https://www.example.com/vo/one-round/barchart-interactive",
-            "https://www.example.com/vo/one-round/sankey",
-            "https://www.example.com/vo/one-round/table",
-            "https://www.example.com/vo/one-round/pie",
-            "https://www.example.com/vb/one-round",
-            "https://www.example.com/ve/one-round?vistype=barchart-interactive",
-            "https://www.example.com/ve/one-round?vistype=barchart-fixed",
-            "https://www.example.com/ve/one-round?vistype=tabular-by-candidate",
-            "https://www.example.com/ve/one-round?vistype=tabular-by-round",
-            "https://www.example.com/ve/one-round?vistype=tabular-by-round-interactive",
-            "https://www.example.com/ve/one-round?vistype=candidate-by-round",
-            "https://www.example.com/ve/one-round?vistype=sankey",
-            "https://www.example.com/ve/one-round?vistype=pie"]}
+            f"https://example.com/v/{slug}",
+            f"https://example.com/ve/{slug}",
+            f"https://example.com/vo/{slug}",
+            f"https://example.com/vo/{slug}/bar",
+            f"https://example.com/vo/{slug}/barchart-interactive",
+            f"https://example.com/vo/{slug}/sankey",
+            f"https://example.com/vo/{slug}/table",
+            f"https://example.com/vo/{slug}/pie",
+            f"https://example.com/vb/{slug}",
+            f"https://example.com/ve/{slug}?vistype=barchart-interactive",
+            f"https://example.com/ve/{slug}?vistype=barchart-fixed",
+            f"https://example.com/ve/{slug}?vistype=tabular-by-candidate",
+            f"https://example.com/ve/{slug}?vistype=tabular-by-round",
+            f"https://example.com/ve/{slug}?vistype=tabular-by-round-interactive",
+            f"https://example.com/ve/{slug}?vistype=candidate-by-round",
+            f"https://example.com/ve/{slug}?vistype=sankey",
+            f"https://example.com/ve/{slug}?vistype=pie",
+            f"https://www.example.com/v/{slug}",
+            f"https://www.example.com/ve/{slug}",
+            f"https://www.example.com/vo/{slug}",
+            f"https://www.example.com/vo/{slug}/bar",
+            f"https://www.example.com/vo/{slug}/barchart-interactive",
+            f"https://www.example.com/vo/{slug}/sankey",
+            f"https://www.example.com/vo/{slug}/table",
+            f"https://www.example.com/vo/{slug}/pie",
+            f"https://www.example.com/vb/{slug}",
+            f"https://www.example.com/ve/{slug}?vistype=barchart-interactive",
+            f"https://www.example.com/ve/{slug}?vistype=barchart-fixed",
+            f"https://www.example.com/ve/{slug}?vistype=tabular-by-candidate",
+            f"https://www.example.com/ve/{slug}?vistype=tabular-by-round",
+            f"https://www.example.com/ve/{slug}?vistype=tabular-by-round-interactive",
+            f"https://www.example.com/ve/{slug}?vistype=candidate-by-round",
+            f"https://www.example.com/ve/{slug}?vistype=sankey",
+            f"https://www.example.com/ve/{slug}?vistype=pie"]}
         requestPostResponse.assert_called_with(expectedUrl,
                                                headers=expectedHeaders,
                                                data=json.dumps(expectedData),
