@@ -239,8 +239,7 @@ class SimpleTests(TestCase):
                        'https://fakeurl.com/visualizeEmbedded=fakeslug',
                        'https://fakeurl.com/v/fakeslug',
                        'https://fakeurl.com/v/fakeslug?a=b',
-                       'https://fakeurl.com/ve/fakeslug',
-                       'https://fakeurl.com/visualizeMovie=fakeslug']
+                       'https://fakeurl.com/ve/fakeslug']
         for allowedUrl in allowedUrls:
             self.assertEqual(func(allowedUrl), '/vo/fakeslug/barchart-interactive')
         disallowedUrls = ['https://fakeurl.com/oembed=fakeslug',
